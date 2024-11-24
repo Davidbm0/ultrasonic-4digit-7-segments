@@ -1,0 +1,30 @@
+#include "SevSeg.h"  // display library
+#include "NewPing.h" // hc-sr04 library
+#define trig A0
+#define echo A1
+#define Max 400   //max distance that can be dtected by hc-sro4
+SevSeg sevseg; 
+NewPing sonar(trig, echo, Max);
+float duration, distance; // to store data
+void setup(){
+  byte numDigits = 4;
+  byte digitPins[] = {2,3,4,5};
+  byte segmentPins[] = {6,7,8,9,10,11,12,13};
+  bool resistorsOnSegments = true; 
+  bool updateWithDelaysIn = true;
+  byte hardwareConfig = COMMON_CATHODE; // U can change it to COMMON_ANODE if needed
+  sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments);
+  sevseg.setBrightness(100);  // U can set it from 0-100
+  Serial.begin(9600);  
+  // distance will be also printed on the serial monitor u can also see it there.
+}
+void loop(){
+   static int deciSeconds = 0; // by this the screen will not flicker
+  duration = sonar.ping(); 
+  distance = (duration / 2) * 0.0343;
+  Serial.println(distance);
+    sevseg.setNumber(distance,3);// this will shift the decimal point to two characters from the right
+    // u can change it to 1 if u need to print more more that 100 cm for ex (distance, 1)
+    sevseg.refreshDisplay(); 
+    
+}
